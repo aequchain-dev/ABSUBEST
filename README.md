@@ -10,7 +10,7 @@
   <img src="https://img.shields.io/badge/Expires-2026--12--22-ff4444?style=for-the-badge" alt="Expires"/>
 </p>
 
-<h1 align="center">ABSUBEST — Absolute Best Framework</h1>
+<h1 align="center">ABSUBEST — AI Performance Optimisation Framework</h1>
 <h3 align="center"><em>Given any explicit purpose, dynamically synthesizes and executes the optimal optimization process for that purpose.</em></h3>
 
 <p align="center">
