@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ABSUBEST Agent Suite + Tooling Environment Implementation Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@400;600;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Palette (from palette.cascade) */
+    --page-bg: #f5f5f4;
+    --section-bg: #f2f1f0;
+    --card-bg: #e9e8e5;
+    --header-fill: #615a45;
+    --cover-block: #69624b;
+    --border: #c2bcaa;
+    --icon: #8a7539;
+    --accent: #927520;
+    --accent-2: #5537af;
+    --text-primary: #171715;
+    --text-muted: #908d86;
+    /* Cover aliases */
+    --c-bg: #f5f5f4;
+    --c-accent: #927520;
+    --c-text: #171715;
+    --c-muted: #908d86;
+    --c-mid: #615a45;
+    --c-surface: #e9e8e5;
+  }
+  @page { size: 794px 1123px; margin: 0; }
+  html, body {
+    margin: 0; padding: 0; width: 794px; height: 1123px;
+    background: var(--c-bg);
+    font-family: 'Inter', 'Noto Sans SC', sans-serif;
+    color: var(--c-text);
+    -webkit-font-smoothing: antialiased;
+  }
+  .cover {
+    position: relative;
+    width: 794px;
+    height: 1123px;
+    overflow: hidden;
+  }
+  /* Layer 1: Grid background */
+  .grid-bg {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(97, 90, 69, 0.04) 0.5px, transparent 0.5px),
+      linear-gradient(to bottom, rgba(97, 90, 69, 0.04) 0.5px, transparent 0.5px);
+    background-size: 50px 50px;
+    pointer-events: none;
+  }
+  /* Layer 2: Left vertical anchor line (6pt = 8px) */
+  .anchor-line {
+    position: absolute;
+    left: 95px;          /* 0.12 * 794 = 95.28 */
+    top: 112px;          /* 0.10 * 1123 = 112.3 */
+    bottom: 112px;       /* 0.90 * 1123 - top = 112.3 from bottom */
+    width: 8px;
+    background: var(--c-accent);
+  }
+  /* Layer 3: Content */
+  .content {
+    position: absolute;
+    left: 155px;         /* anchor + 60px (gap >= 47px from line) */
+    right: 80px;
+    top: 0; bottom: 0;
+  }
+  /* A - Kicker */
+  .kicker {
+    position: absolute;
+    top: 168px;          /* 0.15 * 1123 = 168.45 */
+    left: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 11pt;
+    font-weight: 400;
+    letter-spacing: 3pt;
+    color: var(--c-text);
+    opacity: 0.60;
+    text-transform: uppercase;
+    max-width: 540px;
+  }
+  .kicker .divider {
+    display: inline-block;
+    color: var(--c-muted);
+    opacity: 0.6;
+    margin: 0 12px;
+    font-weight: 300;
+  }
+  /* B - Hero Title */
+  .hero {
+    position: absolute;
+    top: 240px;
+    left: 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 92pt;
+    letter-spacing: -2pt;
+    line-height: 1.0;
+    color: var(--c-text);
+    max-width: 600px;
+  }
+  .hero-sub {
+    position: absolute;
+    top: 380px;
+    left: 0;
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    font-size: 22pt;
+    line-height: 1.25;
+    color: var(--c-text);
+    opacity: 0.85;
+    max-width: 560px;
+    letter-spacing: 0.5pt;
+  }
+  /* C - Summary */
+  .summary {
+    position: absolute;
+    top: 540px;          /* 0.48 * 1123 ≈ 539 */
+    left: 0;
+    font-family: 'Noto Serif SC', serif;
+    font-size: 14pt;
+    font-weight: 400;
+    line-height: 1.65;
+    color: var(--c-text);
+    opacity: 0.88;
+    max-width: 480px;    /* W * 0.6 ≈ 476 */
+  }
+  .summary em {
+    font-style: italic;
+    color: var(--c-accent);
+    opacity: 1.0;
+  }
+  /* Mid-page meta block */
+  .meta-block {
+    position: absolute;
+    top: 760px;
+    left: 0;
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    row-gap: 11px;
+    column-gap: 24px;
+    font-family: 'JetBrains Mono', 'Inter', monospace;
+    font-size: 9pt;
+    line-height: 1.4;
+    color: var(--c-text);
+  }
+  .meta-block .label {
+    color: var(--c-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5pt;
+    font-weight: 500;
+    font-size: 8pt;
+  }
+  .meta-block .value {
+    color: var(--c-text);
+    font-weight: 400;
+  }
+  .meta-block .value .tag {
+    display: inline-block;
+    padding: 1px 6px;
+    background: var(--c-accent);
+    color: var(--c-bg);
+    font-size: 7.5pt;
+    font-weight: 600;
+    letter-spacing: 1pt;
+    text-transform: uppercase;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  /* Bottom declaration band */
+  .declaration-band {
+    position: absolute;
+    left: 155px;
+    right: 80px;
+    bottom: 64px;
+    border-top: 1px solid var(--c-mid);
+    padding-top: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7.5pt;
+    color: var(--c-muted);
+    letter-spacing: 0.5pt;
+    line-height: 1.5;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .declaration-band .left { max-width: 320px; }
+  .declaration-band .right { text-align: right; max-width: 180px; }
+  /* Watermark version stamp (top-right corner) */
+  .version-stamp {
+    position: absolute;
+    top: 90px;
+    right: 80px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9pt;
+    color: var(--c-muted);
+    text-align: right;
+    line-height: 1.6;
+  }
+  .version-stamp .v {
+    font-weight: 600;
+    color: var(--c-accent);
+    font-size: 10pt;
+  }
+  /* Decorative micro-glyph cluster (top-right under version) */
+  .micro-glyphs {
+    position: absolute;
+    top: 175px;
+    right: 80px;
+    display: grid;
+    grid-template-columns: repeat(3, 6px);
+    grid-template-rows: repeat(3, 6px);
+    gap: 4px;
+  }
+  .micro-glyphs span {
+    width: 6px; height: 6px;
+    background: var(--c-accent);
+    opacity: 0.6;
+  }
+  .micro-glyphs span:nth-child(2),
+  .micro-glyphs span:nth-child(4),
+  .micro-glyphs span:nth-child(6),
+  .micro-glyphs span:nth-child(8) {
+    opacity: 0.25;
+  }
+  .micro-glyphs span:nth-child(5) {
+    opacity: 1.0;
+  }
+</style>
+</head>
+<body>
+<div class="cover">
+  <div class="grid-bg"></div>
+  <div class="anchor-line"></div>
+
+  <div class="version-stamp">
+    <div class="v">v3.1 / D2</div>
+    <div>2026-06-22</div>
+    <div>GLM runtime</div>
+  </div>
+  <div class="micro-glyphs">
+    <span></span><span></span><span></span>
+    <span></span><span></span><span></span>
+    <span></span><span></span><span></span>
+  </div>
+
+  <div class="content">
+    <div class="kicker">
+      Agent Suite <span class="divider"></span> Tooling Environment <span class="divider"></span> Implementation Plan
+    </div>
+
+    <div class="hero">ABSUBEST</div>
+
+    <div class="hero-sub">
+      An agent environment that exacts the ABSUBEST framework &mdash;<br>
+      from single-character rigor unto absolute-limit scale.
+    </div>
+
+    <div class="summary">
+      This document is the <em>second deployment</em> of ABSUBEST v3.1: the framework applied unto itself to design the agent, the skills, and the tooling that together execute ABSUBEST at any magnitude. It is process-validated, not optimality-proven &mdash; the G&ouml;delian wall is named, not denied.
+    </div>
+
+    <div class="meta-block">
+      <div class="label">Lineage</div>
+      <div class="value">optibest &rarr; v2.4 &rarr; v3.0 &rarr; v3.0.1 &rarr; <strong>v3.1</strong> &rarr; this design</div>
+
+      <div class="label">ODI</div>
+      <div class="value">9.53 &mdash; Formal+Redundant tier; mandatory portfolio counter-optimization</div>
+
+      <div class="label">Coverage</div>
+      <div class="value">Heuristic &mdash; framework-space uncharacterizable</div>
+
+      <div class="label">Tier</div>
+      <div class="value">2 &mdash; Pareto-formalizable (U(design) is multi-attribute)</div>
+
+      <div class="label">Moral Screens</div>
+      <div class="value"><span class="tag">P6</span>PASS &nbsp; <span class="tag">P6b</span>PASS &nbsp; <span class="tag">P0b</span>N/A</div>
+
+      <div class="label">Patch Level</div>
+      <div class="value">P1&ndash;P14 integrated; F25&ndash;F32 introduced for agent-specific modes</div>
+
+      <div class="label">Status</div>
+      <div class="value">Best-known among characterized alternatives &mdash; pending external validation</div>
+    </div>
+  </div>
+
+  <div class="declaration-band">
+    <div class="left">
+      Absolute Best retained as regulative ideal (Stratum III).<br>
+      Indexical scope: best-known for context C, as of 2026-06-22, under K.
+    </div>
+    <div class="right">
+      Deployment #2<br>
+      Self-application of v3.1<br>
+      Re-verification: external review
+    </div>
+  </div>
+</div>
+</body>
+</html>

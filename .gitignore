@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ruff_cache/
+dist/
+build/
+
+# Project artifacts
+absubest/core/__pycache__/
+absubest/mcp/__pycache__/
+absubest/skills/__pycache__/
+
+# State persistence
+.checkpoints/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

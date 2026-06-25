@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "absubest"
+version = "0.1.0"
+description = "ABSUBEST Framework — meta-optimizer for any explicit purpose"
+readme = "README.md"
+license = {text = "MIT OR Apache-2.0"}
+requires-python = ">=3.11"
+authors = [
+    {name = "ABSUBEST v3.1 Deployment #2", email = "deployment-2@absubest.local"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "typing-extensions>=4.9",
+]
+
+[project.optional-dependencies]
+full = [
+    "sentence-transformers>=2.2",
+    "scikit-learn>=1.3",
+    "numpy>=1.24",
+    "sqlite-utils>=3.35",
+]
+mcp = [
+    "mcp>=0.1",
+]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.1",
+]
+
+[project.scripts]
+absubest = "absubest.cli:main"
+absubest-mcp = "absubest.mcp.absubest_meta:main"
+
+[tool.setuptools.packages.find]
+include = ["absubest", "absubest.*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
